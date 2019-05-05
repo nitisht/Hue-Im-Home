@@ -1,0 +1,9 @@
+FROM arm32v7/alpine:latest
+
+RUN apk add nmap
+
+ADD hue-im-home_arm /hue-im-home
+
+RUN chmod +x /hue-im-home
+
+ENTRYPOINT ["/hue-im-home"]
