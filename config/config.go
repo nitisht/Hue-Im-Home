@@ -2,12 +2,12 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
-const configPath = "/tmp/hue-im-home.json"
+const configPath = "/config/config.json"
 
 type Config struct {
 	AppName string `json:"app_name"`
@@ -22,7 +22,7 @@ func LoadConfig() *Config {
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		// Could not open file, try to create it
-		fmt.Println(err)
+		log.Println(err)
 		return createNewConfig()
 	}
 
@@ -34,7 +34,7 @@ func LoadConfig() *Config {
 	var config Config
 	parseError := json.Unmarshal(byteValue, &config)
 	if parseError != nil {
-		fmt.Println(parseError)
+		log.Println(parseError)
 		return createNewConfig()
 	}
 
@@ -45,7 +45,7 @@ func SaveConfig(config *Config) bool {
 	file, _ := json.MarshalIndent(config, "", " ")
 	err := ioutil.WriteFile(configPath, file, 0644)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 
@@ -53,7 +53,7 @@ func SaveConfig(config *Config) bool {
 }
 
 func createNewConfig() *Config {
-	fmt.Println("Creating new config file")
+	log.Println("Creating new config file")
 	config := Config {
 		AppName: "Hue I'm Home",
 		BridgeApiKey: "",
