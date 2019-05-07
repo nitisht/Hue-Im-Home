@@ -7,8 +7,6 @@ import (
 	"os"
 )
 
-const configPath = "/config/config.json"
-
 type Config struct {
 	AppName string `json:"app_name"`
 	BridgeApiKey string `json:"bridge_api_key"`
@@ -16,9 +14,20 @@ type Config struct {
 	LastState bool `json:"last_state"`
 }
 
+// Return the path to the config file
+func configPath() string {
+	path := "/config/config.json"
+
+	if os.Getenv("CONFIG_FILE") != "" {
+		path = os.Getenv("CONFIG_FILE")
+	}
+
+	return path
+}
+
 func LoadConfig() *Config {
 	// Attempt to open the JSON file
-	jsonFile, err := os.Open(configPath)
+	jsonFile, err := os.Open(configPath())
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		// Could not open file, try to create it
@@ -43,7 +52,7 @@ func LoadConfig() *Config {
 
 func SaveConfig(config *Config) bool {
 	file, _ := json.MarshalIndent(config, "", " ")
-	err := ioutil.WriteFile(configPath, file, 0644)
+	err := ioutil.WriteFile(configPath(), file, 0644)
 	if err != nil {
 		log.Println(err)
 		return false

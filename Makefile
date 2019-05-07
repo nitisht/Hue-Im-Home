@@ -27,8 +27,8 @@ deps:
 # Cross compilation
 build-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_AMD64) -v
-	docker build . -t selexin/hue-im-home:latest -f Dockerfile
+	docker build . -t selexin/hue-im-home:amd64-latest -f Dockerfile
 build-arm:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm $(GOBUILD) -o $(BINARY_ARM) -v
-	docker build . -t selexin/hue-im-home:arm32v7 -f Dockerfile.arm32v7
+	docker build . -t selexin/hue-im-home:arm32v7-latest -f Dockerfile.arm32v7
 

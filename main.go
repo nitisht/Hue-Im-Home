@@ -110,11 +110,25 @@ func scanForDevices() bool {
 	// Pipe the output of nmap into grep to find any occurances of 'open'.
 	// If 'open' is found, then we have atleast one device online!
 	// Anything else means that there are no devices online
+
+	targetDevice := os.Getenv("DEVICE_TYPE") // Either 'android' or 'ios', or blank for both
 	ipRange := os.Getenv("IP_RANGE")
+	ports := "5060,62078" // default to both device types
+
+	// If the user selected a specific device type, only scan those ports
+	if targetDevice == "android" {
+		ports = "5060"
+	} else if targetDevice == "ios" {
+		ports = "62078"
+	} else {
+		targetDevice = "all"
+	}
+
+	log.Printf("Scanning for %s devices on network in range %s", targetDevice, ipRange)
+
 	start := time.Now()
-	log.Println("Scanning network with range", ipRange)
-	out, err := exec.Command("nmap", "-p", "5060,62078", ipRange).Output()
-	// out, err := exec.Command("nmap", "-p", "62078", ipRange).Output() //  iphone only.. for testing
+
+	out, err := exec.Command("nmap", "-p", ports, ipRange).Output()
 	if err != nil {
 		log.Fatal("Failed to run nmap!", err)
 	}
