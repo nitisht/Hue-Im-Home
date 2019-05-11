@@ -8,7 +8,7 @@ BINARY_NAME=hue-im-home
 BINARY_ARM=$(BINARY_NAME)_arm
 BINARY_AMD64=$(BINARY_NAME)_amd64
 
-all: clean build build-linux build-arm
+all: deps clean build-go-linux build-go-arm
 build:
 	$(GOBUILD) -o $(BINARY_NAME) -v
 clean:
@@ -25,10 +25,14 @@ deps:
 	$(GOGET) github.com/heatxsink/go-hue/portal
 
 # Cross compilation
-build-linux:
+build-go-linux:
+	make deps
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_AMD64) -v
-	docker build . -t selexin/hue-im-home:amd64-latest -f Dockerfile
-build-arm:
+build-go-arm:
+	make deps
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm $(GOBUILD) -o $(BINARY_ARM) -v
-	docker build . -t selexin/hue-im-home:arm32v7-latest -f Dockerfile.arm32v7
 
+build-docker-linux:
+	docker build . -t selexin/hue-im-home:amd64-latest -f Dockerfile
+build-docker-arm:
+	docker build . -t selexin/hue-im-home:arm32v7-latest -f Dockerfile.arm32v7
