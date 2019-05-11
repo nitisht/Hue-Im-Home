@@ -27,17 +27,12 @@ deps:
 # Cross compilation
 build-go-linux:
 	make deps
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_AMD64) -v
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_AMD64)
 build-go-arm:
 	make deps
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm $(GOBUILD) -o $(BINARY_ARM) -v
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm $(GOBUILD) -o $(BINARY_ARM)
 
 build-docker-linux:
 	docker build . -t selexin/hue-im-home:amd64-latest -f docker/Dockerfile
 build-docker-arm:
-	# Download Qemu binary if they have not been donwloaded yet
-	[ -f qemu-arm-static ] || (curl -L https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz | tar zxvf - -C . && mv qemu-3.0.0+resin-arm/qemu-arm-static .)
-
-	[ ! -d qemu-3.0.0+resin-arm ] || rm -fr qemu-3.0.0+resin-arm
-
 	docker build . -t selexin/hue-im-home:arm32v7-latest -f docker/Dockerfile.arm32v7
