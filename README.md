@@ -86,3 +86,6 @@ The architectures supported by this image are:
 which will cause the program to think that the device has left, and to turn off the lights.
  - [ ] The rules for turning on/off lights are very basic at the moment. Plans are in the works to add time-based rules to avoid turning on the lights in the middle of the night, etc.
 
+## License
+
+MIT - see [LICENSE.md](LICENSE.md)
