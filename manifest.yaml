@@ -1,0 +1,12 @@
+image: selexin/hue-im-home:latest
+manifests:
+  -
+    image: selexin/hue-im-home:amd64-latest
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: selexin/hue-im-home:arm32v7-latest
+    platform:
+      architecture: arm
+      os: linux

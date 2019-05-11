@@ -5,6 +5,22 @@
 It works by port-scanning your network for known open Android/iOS ports,
 and changes your hue lights when your device's ports open and close on the network.
 
+ - GitHub: https://github.com/se1exin/Hue-Im-Home
+ - Docker Hub: https://hub.docker.com/r/selexin/hue-im-home
+
+## Usage
+
+Example for running with **docker**
+
+```
+docker run \
+ -e IP_RANGE="10.1.1.11-20" \
+ -e BRIDGE_IP="10.1.1.10" \
+ -v </path/to/appdata/config>:/config \
+ --restart unless-stopped \
+ selexin/hue-im-home
+```
+
 ## First Start
 
 Please ensure the Bridge Button has been pressed before starting the container.
@@ -23,7 +39,7 @@ Container images are configured using the following parameters passed at runtime
 | :----: | --- |
 | `-e IP_RANGE=W.X.Y.Z` | (required) nmap style IP range - see below for explanation  |
 | `-e BRIDGE_IP=W.X.Y.Z` | (optional) IP Address of your Hue Bridge - see below for explanation |
-| `-e DEVICE_TYPE=` | (optional) set to 'android' or 'ios' to limit scanning to that device type |
+| `-e DEVICE_TYPE=` | (optional) set to **"android"** or **"ios"** to limit scanning to that device type |
 | `-v /config` | volume to store the required config file |
 
 ### `IP_RANGE` Environment Variable
@@ -52,6 +68,10 @@ or look on your router for it's IP Address.
  
 
 ## Supported Architectures
+
+This image supports multiple architectures, and utilises docker manifest for multi-platform awareness.
+
+Simply pulling selexin/hue-im-home should retrieve the correct image for your arch, but you can also pull specific arch images via tags. 
 
 The architectures supported by this image are:
 
