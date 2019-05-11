@@ -33,6 +33,9 @@ build-go-arm:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm $(GOBUILD) -o $(BINARY_ARM) -v
 
 build-docker-linux:
-	docker build . -t selexin/hue-im-home:amd64-latest -f Dockerfile
+	docker build . -t selexin/hue-im-home:amd64-latest -f docker/Dockerfile
 build-docker-arm:
-	docker build . -t selexin/hue-im-home:arm32v7-latest -f Dockerfile.arm32v7
+	# Download Qemu binary if they have not been donwloaded yet
+	[ -f qemu-3.0.0+resin-arm/qemu-arm-static ] || curl -L https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz | tar zxvf - -C .
+
+	docker build . -t selexin/hue-im-home:arm32v7-latest -f docker/Dockerfile.arm32v7
