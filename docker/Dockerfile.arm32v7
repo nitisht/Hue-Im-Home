@@ -4,7 +4,7 @@ COPY ./ .
 RUN make build-go-arm
 
 FROM arm32v7/alpine:latest
-COPY qemu-3.0.0+resin-arm/qemu-arm-static /usr/bin
+COPY qemu-arm-static /usr/bin
 RUN apk add nmap
 COPY --from=builder /go/src/github.com/se1exin/hue-im-home/hue-im-home_arm /hue-im-home
 RUN chmod +x /hue-im-home && mkdir /config
