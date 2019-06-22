@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -56,8 +57,14 @@ func runLoop(appConfig *config.Config) {
 		}
 	}
 
-	// Wait for 10 seconds, then run again!
-	duration := time.Duration(10) * time.Second
+	// Wait for SCAN_INTERVAL seconds, then run again!
+	interval, err := strconv.Atoi(os.Getenv("SCAN_INTERVAL"))
+	if err != nil {
+		// Default to 10 seconds if the user did not pass a valid timeout period
+		interval = 10
+	}
+	duration := time.Duration(interval) * time.Second
+
 	time.Sleep(duration)
 
 	runLoop(appConfig)

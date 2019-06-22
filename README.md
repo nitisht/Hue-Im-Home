@@ -16,6 +16,7 @@ Example for running with **docker**
 docker run \
  -e IP_RANGE="10.1.1.11-20" \
  -e BRIDGE_IP="10.1.1.10" \
+ -e SCAN_INTERVAL=10 \
  -v </path/to/appdata/config>:/config \
  --restart unless-stopped \
  selexin/hue-im-home
@@ -39,6 +40,7 @@ Container images are configured using the following parameters passed at runtime
 | :----: | --- |
 | `-e IP_RANGE=W.X.Y.Z` | (required) nmap style IP range - see below for explanation  |
 | `-e BRIDGE_IP=W.X.Y.Z` | (optional) IP Address of your Hue Bridge - see below for explanation |
+| `-e SCAN_INTERVAL=` | (optional) Time in seconds to wait before re-scanning the network. Default is 10 seconds |
 | `-e DEVICE_TYPE=` | (optional) set to **"android"** or **"ios"** to limit scanning to that device type |
 | `-v /config` | volume to store the required config file |
 
