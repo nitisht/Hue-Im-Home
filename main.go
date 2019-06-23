@@ -5,6 +5,7 @@ import (
 	"github.com/heatxsink/go-hue/lights"
 	"github.com/heatxsink/go-hue/portal"
 	"github.com/se1exin/hue-im-home/config"
+	"github.com/se1exin/hue-im-home/timerange"
 	"log"
 	"os"
 	"os/exec"
@@ -42,18 +43,39 @@ func main() {
 
 func runLoop(appConfig *config.Config) {
 	if checkConfig(appConfig) {
-		// All config steps passed. Now it's time to play with some lights..
-		// Check if devices are online or offline
-		devicesOnline := scanForDevices()
-		// Only attempt to change the lights if there has been a change since the last scan
-		// @TODO: Implement some more advanced logic to avoid switching the lights at the wrong time/false positives
-		if appConfig.LastState != devicesOnline {
-			log.Println("Device state changed to:", devicesOnline)
-			if switchLights(appConfig, devicesOnline) {
-				// We successfully changed the state, update the config for the next scan
-				appConfig.LastState = devicesOnline
-				config.SaveConfig(appConfig)
+
+		onTimeRange := os.Getenv("ON_TIME_RANGE")
+		offTimeRange := os.Getenv("OFF_TIME_RANGE")
+
+		canSwitchOn := checkTimePeriodRipe(onTimeRange, appConfig.GetLastOnTime())
+		canSwitchOff := checkTimePeriodRipe(offTimeRange, appConfig.GetLastOffTime())
+
+		if canSwitchOn || canSwitchOff {
+			// All config steps passed, and we are allowed to change the lights.
+			// Check if devices are online or offline
+			devicesOnline := scanForDevices()
+
+			if devicesOnline && !canSwitchOn {
+				log.Println("Device came online but we are not in valid ON_TIME_RANGE. Skipping..")
+			} else if !devicesOnline && !canSwitchOff {
+				log.Println("Device went offline but we are not in valid OFF_TIME_RANGE. Skipping..")
+			} else if appConfig.LastState != devicesOnline {
+				// Only attempt to change the lights if there has been a change since the last scan
+				log.Println("Device state changed to:", devicesOnline)
+				if switchLights(appConfig, devicesOnline) {
+					// We successfully changed the state, update the config for the next scan
+					appConfig.LastState = devicesOnline
+					// Save the last on/off time for more advanced on/off logic later
+					if devicesOnline {
+						appConfig.SetLastOnTime(time.Now())
+					} else {
+						appConfig.SetLastOffTime(time.Now())
+					}
+					config.SaveConfig(appConfig)
+				}
 			}
+		} else {
+			log.Println("Cannot turn lights on or off. Nothing to do..")
 		}
 	}
 
@@ -109,6 +131,33 @@ func checkConfig(appConfig *config.Config) bool {
 	}
 
 	return configValid
+}
+
+/**
+ * For a given Time Range (in format hh:mm-hh:mm), check that both the current time
+ *  is within that range, and that a given comparison time is NOT within that range
+ */
+func checkTimePeriodRipe(inputTimeRange string, lastTime *time.Time) bool {
+	timeRange, err := timerange.NewTimeRange(inputTimeRange)
+
+	if err != nil {
+		// User has not set an valid time range, default to always allow
+		return true
+	}
+
+	// User has set an valid time range, but we are not currently in that range.
+	if !timeRange.HasTime(time.Now()) {
+		return false
+	}
+
+	// We are in the time range, have the lights been turned on/off in this time range before?
+	if lastTime == nil {
+		// The light has never been turned on/off.. so yes we can turn the lights on/off now
+		return true
+	}
+
+	// Lights have been turned on/off before, but we cant turn them on/off again if already on/off in this time range
+	return !timeRange.HasTime(*lastTime)
 }
 
 func scanForDevices() bool {

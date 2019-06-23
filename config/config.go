@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 )
 
 type Config struct {
@@ -12,6 +13,8 @@ type Config struct {
 	BridgeApiKey string `json:"bridge_api_key"`
 	BridgeIPAddress string `json:"bridge_ip_address"`
 	LastState bool `json:"last_state"`
+	LastOnTime string `json:"last_on_time"`
+	LastOffTime string `json:"last_off_time"`
 }
 
 // Return the path to the config file
@@ -68,10 +71,40 @@ func createNewConfig() *Config {
 		BridgeApiKey: "",
 		BridgeIPAddress: "",
 		LastState: false,
+		LastOnTime: "",
+		LastOffTime: "",
 	}
 
 	if SaveConfig(&config) {
 		return &config
 	}
 	return nil
+}
+
+func (c *Config) GetLastOnTime() *time.Time {
+	// Try to parse the Last On Time into a Time object
+	_time, err := time.ParseInLocation("2006-01-02T15:04:05", c.LastOnTime, time.Local)
+	if err != nil {
+		return nil
+	}
+	return &_time
+}
+
+func (c *Config) GetLastOffTime() *time.Time {
+	// Try to parse the Last Off Time into a Time object
+	_time, err := time.ParseInLocation("2006-01-02T15:04:05", c.LastOffTime, time.Local)
+	if err != nil {
+		return nil
+	}
+	return &_time
+}
+
+func (c *Config) SetLastOnTime(time time.Time) {
+	// Try to parse the Last On Time into a Time object
+	c.LastOnTime = time.Format("2006-01-02T15:04:05")
+}
+
+func (c *Config) SetLastOffTime(time time.Time) {
+	// Try to parse the Last On Time into a Time object
+	c.LastOffTime = time.Format("2006-01-02T15:04:05")
 }
